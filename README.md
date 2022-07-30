@@ -1,0 +1,2 @@
+# fabrik
+A configuration center.
