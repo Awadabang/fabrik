@@ -2,19 +2,20 @@ package server
 
 import (
 	"log"
-	"sync"
 	"time"
+
+	"github.com/Awadabang/fabrik/internal/services/registry"
 )
 
 type FabrikServer struct {
-	ServiceNode *sync.Map
+	Registry *registry.Registry
 }
 
 type FabrikServeOption func(*FabrikServer)
 
-func WithRegistyNode(serviceNode *sync.Map) FabrikServeOption {
+func WithRegisty(registry *registry.Registry) FabrikServeOption {
 	return func(fs *FabrikServer) {
-		fs.ServiceNode = serviceNode
+		fs.Registry = registry
 	}
 }
 
@@ -33,9 +34,11 @@ func (fs *FabrikServer) Start() {
 	for {
 		<-heartBeat.C
 		log.Println("FabrikServer HeartBeat...")
-		fs.ServiceNode.Range(func(key, value any) bool {
-			log.Printf("Service Name: %v, Addr: %v\n", key, value)
-			return true
-		})
+
+		fs.Registry.Mutex.RLock()
+		for _, registration := range fs.Registry.Registrations {
+			log.Printf("Service Name: %v, Addr: %v\n", registration.ServiceName, registration.ServiceURL)
+		}
+		fs.Registry.Mutex.RUnlock()
 	}
 }

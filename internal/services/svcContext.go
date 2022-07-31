@@ -14,18 +14,21 @@ type Svc struct {
 
 func GenerateSrevices() *Svc {
 	// Logserver
-	logServer := logservice.NewLogServer()
+	logServer := logservice.NewLogServer("info.log")
+	logServer.Write("LogServer Constructed")
 
 	// Registry
 	registry := registry.NewRegistry()
-	go registry.Start()
+	logServer.Write("Registry Constructed")
 
 	// Fabrik
 	fabrikServer := server.NewFabrikServer(
-		server.WithRegistyNode(&registry.ServiceNode),
+		server.WithRegisty(registry),
 	)
-	fabrikServer.Start()
+	go fabrikServer.Start()
+	logServer.Write("FabrikServer Constructed")
 
+	logServer.Write("Fabrik Constructed Completly")
 	return &Svc{
 		FabrikServer: fabrikServer,
 		Registry:     registry,

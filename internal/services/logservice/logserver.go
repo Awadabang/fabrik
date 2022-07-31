@@ -6,13 +6,14 @@ import (
 )
 
 type LogServer struct {
+	log *stlog.Logger
 }
 
-func NewLogServer() *LogServer {
-	return &LogServer{}
+func NewLogServer(destination string) *LogServer {
+	return &LogServer{
+		log: stlog.New(FileLog(destination), "Fabrik: ", stlog.LstdFlags),
+	}
 }
-
-var log *stlog.Logger
 
 type FileLog string
 
@@ -26,10 +27,6 @@ func (fl FileLog) Write(data []byte) (int, error) {
 	return f.Write(data)
 }
 
-func Run(destination string) {
-	log = stlog.New(FileLog(destination), "go", stlog.LstdFlags)
-}
-
 func (l *LogServer) Write(message string) {
-	log.Printf("%v\n", message)
+	l.log.Printf("%v\n", message)
 }
