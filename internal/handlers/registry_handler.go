@@ -43,3 +43,28 @@ func RegisterHandler(svcCtx *services.Svc) http.HandlerFunc {
 		svcCtx.Registry.Add(req.Name, req.Addr)
 	}
 }
+
+func DestroyHandler(svcCtx *services.Svc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		bodyBytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.Write([]byte("error when reading body"))
+			return
+		}
+		req := registry.DestroyReq{}
+		err = json.Unmarshal(bodyBytes, &req)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		w.Write([]byte("销毁请求为："))
+		w.Write(bodyBytes)
+		svcCtx.LogService.Write("销毁请求：" + string(bodyBytes))
+		svcCtx.Registry.Delete(req.Name)
+	}
+}

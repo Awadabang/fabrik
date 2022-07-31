@@ -20,6 +20,7 @@ func FabrikServe() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.RootHandler)
 	mux.HandleFunc("/register", handlers.RegisterHandler(svcContext))
+	mux.HandleFunc("/destroy", handlers.DestroyHandler(svcContext))
 	mux.HandleFunc("/log", handlers.LogHandler(svcContext))
 
 	httpServer := &http.Server{

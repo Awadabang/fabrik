@@ -79,3 +79,7 @@ func (r *Registry) Add(name, url string) {
 		ServiceURL:  url,
 	})
 }
+
+func (r *Registry) Delete(name string) {
+	r.Registrations.Delete(name)
+}
