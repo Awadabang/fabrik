@@ -37,6 +37,18 @@
                     "text": "发射器"
                 },
                 "children": []
+            },
+            {
+                "data": {
+                    "id": "cltl84odc7c0",
+                    "created": 1659244892494,
+                    "text": "日志",
+                    "layout_right_offset": {
+                        "x": -433,
+                        "y": -133
+                    }
+                },
+                "children": []
             }
         ]
     },

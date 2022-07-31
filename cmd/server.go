@@ -1,18 +1,25 @@
 package cmd
 
 import (
-	"github.com/Awadabang/fabrik/internal/registry"
-	"github.com/Awadabang/fabrik/internal/server"
+	"net/http"
+
+	"github.com/Awadabang/fabrik/internal/handlers"
+	"github.com/Awadabang/fabrik/internal/services"
 )
 
 func FabrikServe() {
-	// Fabrik
-	server := server.NewFabrikServer(
-		server.WithName(),
-	)
-	go server.Start()
+	svcContext := services.GenerateSrevices()
 
-	// Registry
-	registry := registry.NewRegistry()
-	registry.Start()
+	//Http Server
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", handlers.RootHandler)
+	mux.HandleFunc("/register", handlers.RegisterHandler(svcContext))
+
+	httpServer := &http.Server{
+		Addr:    "0.0.0.0:8111",
+		Handler: mux,
+	}
+
+	go httpServer.ListenAndServe()
+
 }

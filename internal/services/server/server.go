@@ -7,14 +7,14 @@ import (
 )
 
 type FabrikServer struct {
-	Node sync.Map
+	ServiceNode *sync.Map
 }
 
 type FabrikServeOption func(*FabrikServer)
 
-func WithName() FabrikServeOption {
+func WithRegistyNode(serviceNode *sync.Map) FabrikServeOption {
 	return func(fs *FabrikServer) {
-		fs.Node.Store("ymonitor", "localhost:19668")
+		fs.ServiceNode = serviceNode
 	}
 }
 
@@ -33,8 +33,8 @@ func (fs *FabrikServer) Start() {
 	for {
 		<-heartBeat.C
 		log.Println("FabrikServer HeartBeat...")
-		fs.Node.Range(func(key, value any) bool {
-			log.Println(key, value)
+		fs.ServiceNode.Range(func(key, value any) bool {
+			log.Printf("Service Name: %v, Addr: %v\n", key, value)
 			return true
 		})
 	}
