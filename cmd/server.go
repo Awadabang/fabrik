@@ -1,12 +1,17 @@
 package cmd
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/Awadabang/fabrik/internal/handlers"
 	"github.com/Awadabang/fabrik/internal/services"
+	"github.com/Awadabang/fabrik/pkg/signal"
 )
+
+var GlobalChan = make(chan struct{})
 
 func FabrikServe() {
 	svcContext := services.GenerateSrevices()
@@ -22,8 +27,24 @@ func FabrikServe() {
 		Handler: mux,
 	}
 
-	if err := httpServer.ListenAndServe(); err != nil {
-		svcContext.LogService.Write(err.Error())
-		log.Println(err.Error())
+	go func() {
+		<-signal.SigChan
+
+		timeoutCtx, timeoutCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer timeoutCancel()
+
+		if err := httpServer.Shutdown(timeoutCtx); err != nil {
+			// Error from closing listeners, or context timeout:
+			log.Println("Http服务暴力停止，一般是达到超时context的时间当前还有尚未完结的http请求：" + err.Error())
+		} else {
+			log.Println("Http服务优雅停止")
+		}
+
+		close(GlobalChan)
+	}()
+
+	if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		svcContext.LogService.Write("Http服务异常 " + err.Error())
+		log.Println("Http服务异常", err.Error())
 	}
 }
