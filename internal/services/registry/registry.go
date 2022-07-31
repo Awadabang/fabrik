@@ -10,8 +10,9 @@ import (
 )
 
 type Registration struct {
-	ServiceName string
-	ServiceURL  string
+	ServiceName      string
+	ServiceURL       string
+	ServiveAccessKey string
 }
 
 type Registry struct {
@@ -55,7 +56,17 @@ func (r *Registry) AliveCheck() {
 				return true
 			}
 			log.Printf("AliveCheck: service name: %v, addr: %v\n", registration.ServiceName, registration.ServiceURL)
-			resp, err := r.Client.Get(registration.ServiceURL + "/ping")
+
+			req, err := http.NewRequest(http.MethodPost, registration.ServiceURL+"/ping", nil)
+			if err != nil {
+				log.Printf("service: %v NewRequest error\n", registration.ServiceName)
+				r.Log.Write(registration.ServiceName + " " + err.Error())
+				return true
+			}
+
+			req.Header.Set("accessKey", registration.ServiveAccessKey)
+
+			resp, err := r.Client.Do(req)
 			if err != nil {
 				log.Printf("service: %v is unhealthy\n", registration.ServiceName)
 				r.Log.Write(registration.ServiceName + " " + err.Error())
@@ -73,10 +84,11 @@ func (r *Registry) AliveCheck() {
 	}
 }
 
-func (r *Registry) Add(name, url string) {
+func (r *Registry) Add(name, url, accessKey string) {
 	r.Registrations.Store(name, Registration{
-		ServiceName: name,
-		ServiceURL:  url,
+		ServiceName:      name,
+		ServiceURL:       url,
+		ServiveAccessKey: accessKey,
 	})
 }
 

@@ -40,7 +40,7 @@ func RegisterHandler(svcCtx *services.Svc) http.HandlerFunc {
 		w.Write([]byte("注册请求为："))
 		w.Write(bodyBytes)
 		svcCtx.LogService.Write("注册请求：" + string(bodyBytes))
-		svcCtx.Registry.Add(req.Name, req.Addr)
+		svcCtx.Registry.Add(req.Name, req.Addr, req.AccessKey)
 	}
 }
 
