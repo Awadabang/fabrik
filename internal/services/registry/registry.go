@@ -15,7 +15,7 @@ type Registration struct {
 }
 
 type Registry struct {
-	Registrations []Registration
+	Registrations sync.Map
 	Client        *http.Client
 	Log           *logservice.LogServer
 
@@ -49,14 +49,17 @@ func (r *Registry) AliveCheck() {
 	timer := time.NewTicker(10 * time.Second)
 	for {
 		<-timer.C
-		r.Mutex.RLock()
-		for _, registration := range r.Registrations {
+		r.Registrations.Range(func(key, value any) bool {
+			registration, ok := value.(Registration)
+			if !ok {
+				return true
+			}
 			log.Printf("AliveCheck: service name: %v, addr: %v\n", registration.ServiceName, registration.ServiceURL)
 			resp, err := r.Client.Get(registration.ServiceURL + "/ping")
 			if err != nil {
 				log.Printf("service: %v is unhealthy\n", registration.ServiceName)
 				r.Log.Write(registration.ServiceName + " " + err.Error())
-				continue
+				return true
 			}
 			if resp.StatusCode == http.StatusOK {
 				log.Printf("service: %v is OK\n", registration.ServiceName)
@@ -65,15 +68,13 @@ func (r *Registry) AliveCheck() {
 				log.Printf("service: %v is unhealthy\n", registration.ServiceName)
 				r.Log.Write(registration.ServiceName + resp.Status)
 			}
-		}
-		r.Mutex.RUnlock()
+			return true
+		})
 	}
 }
 
 func (r *Registry) Add(name, url string) {
-	r.Mutex.Lock()
-	defer r.Mutex.Unlock()
-	r.Registrations = append(r.Registrations, Registration{
+	r.Registrations.Store(name, Registration{
 		ServiceName: name,
 		ServiceURL:  url,
 	})
