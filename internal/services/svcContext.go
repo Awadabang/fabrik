@@ -25,7 +25,6 @@ func GenerateSrevices() *Svc {
 	fabrikServer := server.NewFabrikServer(
 		server.WithRegisty(registry),
 	)
-	go fabrikServer.Start()
 	logServer.Write("FabrikServer Constructed")
 
 	logServer.Write("Fabrik Constructed Completly")

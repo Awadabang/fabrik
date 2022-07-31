@@ -1,6 +1,10 @@
 package registry
 
-import "sync"
+import (
+	"log"
+	"sync"
+	"time"
+)
 
 type Registration struct {
 	ServiceName string
@@ -24,8 +28,16 @@ func NewRegistry(opts ...RegistryOption) *Registry {
 	return registry
 }
 
-func (r *Registry) Start() {
-
+func (r *Registry) AliveCheck() {
+	timer := time.NewTicker(10 * time.Second)
+	for {
+		<-timer.C
+		r.Mutex.RLock()
+		for _, registration := range r.Registrations {
+			log.Printf("AliveCheck: service name: %v, addr: %v\n", registration.ServiceName, registration.ServiceURL)
+		}
+		r.Mutex.RUnlock()
+	}
 }
 
 func (r *Registry) Add(name, url string) {
