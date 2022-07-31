@@ -15,6 +15,8 @@ var GlobalChan = make(chan struct{})
 
 func FabrikServe() {
 	svcContext := services.GenerateSrevices()
+	//Alive Check
+	go svcContext.Registry.AliveCheck()
 
 	//Http Server
 	mux := http.NewServeMux()

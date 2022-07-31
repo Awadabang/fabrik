@@ -27,7 +27,6 @@ func GenerateSrevices() *Svc {
 		}),
 		registry.WithLog(logServer),
 	)
-	go registry.AliveCheck()
 	logServer.Write("Registry Constructed")
 
 	// Fabrik
