@@ -1,0 +1,46 @@
+{
+    "root": {
+        "data": {
+            "id": "cltgnh6mh3s0",
+            "created": 1659231989632,
+            "text": "FabrikServer"
+        },
+        "children": [
+            {
+                "data": {
+                    "id": "cltgnpvennc0",
+                    "created": 1659232008544,
+                    "text": "注册器"
+                },
+                "children": []
+            },
+            {
+                "data": {
+                    "id": "cltgnrz9m3s0",
+                    "created": 1659232013131,
+                    "text": "健康检查器"
+                },
+                "children": []
+            },
+            {
+                "data": {
+                    "id": "cltgnx7s2740",
+                    "created": 1659232024530,
+                    "text": "负载均衡器"
+                },
+                "children": []
+            },
+            {
+                "data": {
+                    "id": "cltgo21e7r40",
+                    "created": 1659232035028,
+                    "text": "发射器"
+                },
+                "children": []
+            }
+        ]
+    },
+    "template": "right",
+    "theme": "fresh-blue",
+    "version": "1.4.43"
+}

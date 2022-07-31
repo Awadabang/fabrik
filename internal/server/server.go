@@ -29,7 +29,7 @@ func NewFabrikServer(opts ...FabrikServeOption) *FabrikServer {
 }
 
 func (fs *FabrikServer) Start() {
-	heartBeat := time.NewTicker(5 * time.Second)
+	heartBeat := time.NewTicker(10 * time.Second)
 	for {
 		<-heartBeat.C
 		log.Println("FabrikServer HeartBeat...")
