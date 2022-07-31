@@ -1,6 +1,9 @@
 package services
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/Awadabang/fabrik/internal/services/logservice"
 	"github.com/Awadabang/fabrik/internal/services/registry"
 	"github.com/Awadabang/fabrik/internal/services/server"
@@ -18,7 +21,13 @@ func GenerateSrevices() *Svc {
 	logServer.Write("LogServer Constructed")
 
 	// Registry
-	registry := registry.NewRegistry()
+	registry := registry.NewRegistry(
+		registry.WithClient(&http.Client{
+			Timeout: 10 * time.Second,
+		}),
+		registry.WithLog(logServer),
+	)
+	go registry.AliveCheck()
 	logServer.Write("Registry Constructed")
 
 	// Fabrik
